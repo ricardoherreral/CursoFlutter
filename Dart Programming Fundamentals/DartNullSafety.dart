@@ -2,7 +2,7 @@ void main() {
   late Car car;
   car = Car("BMW");
   if (car != null) {
-    print(car!.name);
+    print(car.name);
   }
 }
 
