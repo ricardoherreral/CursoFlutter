@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageStateClass extends State<HomePage> {
-  late double _deviceHeight, _deviceWidth;
+  late double _deviceHeight;
 
   //Por esto es clase Stateful
   String? _newTaskContent;
@@ -28,7 +28,7 @@ class _HomePageStateClass extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     _deviceHeight = MediaQuery.of(context).size.height;
-    _deviceWidth = MediaQuery.of(context).size.width;
+    //_deviceWidth = MediaQuery.of(context).size.width;
 
     print("Input Value: $_newTaskContent");
 
