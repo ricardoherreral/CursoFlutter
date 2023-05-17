@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:taskly/models/task.dart';
 
 class HomePage extends StatefulWidget {
   HomePage();
@@ -14,8 +16,14 @@ class _HomePageStateClass extends State<HomePage> {
 
   //Por esto es clase Stateful
   String? _newTaskContent;
+  Box? _box;
 
   _HomePageStateClass();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,28 +43,61 @@ class _HomePageStateClass extends State<HomePage> {
           ),
         ),
       ),
-      body: _tasksList(),
+      body: _taskView(),
       floatingActionButton: _addTaskButton(),
     );
   }
 
+  Widget _taskView() {
+    // Hive.openBox('nombre_box') abre un contenedor donde ponemos
+    // los datos que neceistamos guardar, podemos abrir muchas boxes
+    // Es una future function (async | await no funciona porque es de UI)
+
+    return FutureBuilder(
+      future: Hive.openBox('tasks'),
+      builder: (
+        BuildContext _context,
+        AsyncSnapshot _snapshot,
+      ) {
+        if (_snapshot.connectionState == ConnectionState.done) {
+          // Guarda en box lo que hay adentro de 'tasks'
+          _box = _snapshot.data;
+          return _tasksList();
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
+  }
+
   Widget _tasksList() {
-    return ListView(
-      children: [
-        ListTile(
-          title: const Text(
-            "Do Laundry!",
+    //Task _newTask =
+    //    Task(content: "Go to Gym", timestamp: DateTime.now(), done: false); // Guarda en lla box esos valores
+    // _box?.add(_newTask.toMap()); // ? Si box no existe, no corre esta linea
+
+    List tasks = _box!.values.toList(); // ! Null safety
+    return ListView.builder(
+      itemCount: tasks.length,
+      itemBuilder: (BuildContext _context, int _index) {
+        var task = Task.fromMap(tasks[_index]);
+        return ListTile(
+          title: Text(
+            task.content.toString(),
             style: TextStyle(
-              decoration: TextDecoration.lineThrough,
+              decoration: task.done ? TextDecoration.lineThrough : null,
             ),
           ),
-          subtitle: Text(DateTime.now().toString()),
-          trailing: const Icon(
-            Icons.check_box_outlined,
+          subtitle: Text(task.timestamp.toString()),
+          trailing: Icon(
+            task.done
+                ? Icons.check_box_outlined
+                : Icons.check_box_outline_blank_outlined,
             color: Colors.red,
           ),
-        )
-      ],
+        );
+      },
     );
   }
 
