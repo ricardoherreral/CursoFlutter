@@ -59,7 +59,7 @@ class _HomePageStateClass extends State<HomePage> {
         BuildContext _context,
         AsyncSnapshot _snapshot,
       ) {
-        if (_snapshot.connectionState == ConnectionState.done) {
+        if (_snapshot.hasData) {
           // Guarda en box lo que hay adentro de 'tasks'
           _box = _snapshot.data;
           return _tasksList();
@@ -96,6 +96,19 @@ class _HomePageStateClass extends State<HomePage> {
                 : Icons.check_box_outline_blank_outlined,
             color: Colors.red,
           ),
+          onTap: () {
+            setState(() {
+              task.done = !task.done; // Si es true se vuelve false y biseversa
+              _box!.putAt(
+                _index,
+                task.toMap(),
+              );
+            });
+          },
+          onLongPress: () {
+            _box!.deleteAt(_index);
+            setState(() {});
+          },
         );
       },
     );
@@ -115,12 +128,27 @@ class _HomePageStateClass extends State<HomePage> {
         return AlertDialog(
           title: const Text("Add New Task!"),
           content: TextField(
-            onSubmitted: (_value) {},
+            // on submited es cuando se pulsa el check en el teclado
+            onSubmitted: (_) {
+              // Guarda en la base de datos (Hive desde _box) la nueva task escrita
+              if (_newTaskContent != null) {
+                var _task = Task(
+                  content: _newTaskContent!,
+                  timestamp: DateTime.now(),
+                  done: false,
+                );
+                _box!.add(_task.toMap());
+                setState(() {
+                  _newTaskContent = null;
+                  Navigator.pop(
+                      context); //Cierra la alert sin necesidad de hacer click fuera de ella
+                });
+              }
+            },
             onChanged: (_value) {
               // Esta es la manera correcta de guardar un valor,
               // cada que cambia el contenido del TexField se manda
               //llamar la funcion build, por eso se imprime cada que se ingresa una letra
-
               setState(() {
                 _newTaskContent = _value;
                 if (_newTaskContent == '') {
