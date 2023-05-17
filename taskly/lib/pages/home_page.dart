@@ -23,13 +23,42 @@ class _HomePageStateClass extends State<HomePage> {
       appBar: AppBar(
         toolbarHeight: _deviceHeight * 0.15,
         title: const Text(
-          "Taskly",
+          "Taskly!",
           style: TextStyle(
             fontSize: 25,
             color: Colors.white,
           ),
         ),
       ),
+      body: _tasksList(),
+      floatingActionButton: _addTaskButton(),
     );
   }
+}
+
+Widget _tasksList() {
+  return ListView(
+    children: [
+      ListTile(
+        title: const Text(
+          "Do Laundry!",
+          style: TextStyle(
+            decoration: TextDecoration.lineThrough,
+          ),
+        ),
+        subtitle: Text(DateTime.now().toString()),
+        trailing: const Icon(
+          Icons.check_box_outlined,
+          color: Colors.red,
+        ),
+      )
+    ],
+  );
+}
+
+Widget _addTaskButton() {
+  return FloatingActionButton(
+    onPressed: () {},
+    child: const Icon(Icons.add),
+  );
 }
